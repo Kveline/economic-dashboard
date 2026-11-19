@@ -1,0 +1,418 @@
+@import "tailwindcss";
+
+/*
+ * Colours: one vivid blue accent, emerald for up / good, rose for down / bad,
+ * on cool slate whites (light) or near-black slate (dark). Light is the default; [data-theme="dark"] on <html> swaps every
+ * colour below (see the theme script in app/layout.tsx).
+ */
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * Modern palette (cool slate neutrals, one vivid blue, emerald / rose for
+   * up / down). Every text colour passes WCAG AA (4.5:1) on cards and grey boxes.
+   */
+  /* Surfaces: page (outside) → canvas (the frame) → card (raised, white) → inset (recessed grey) → chip */
+  --color-page: #f6f8fb;
+  --color-canvas: #ffffff;
+  --color-card: #ffffff;
+  --color-inset: #f1f5f9;
+  --color-chip: #e2e8f0;
+  --color-line: #e2e8f0;
+
+  /* Text (slate) */
+  --color-ink: #0f172a;
+  --color-muted: #475569;
+  --color-faint: #5b6779;
+
+  /* Highlight: vivid blue. primary is text-safe; bright/accent are for marks and lines. */
+  --color-primary: #2563eb;
+  --color-accent: #3b82f6;
+  --color-bright: #3b82f6;
+  --color-soft: #94a3b8;
+  --color-mist: #eff4ff;
+  /* Blue marks (dots, the main chart line) drawn in the primary blue. Same as primary unless a scope (e.g. .pastel) overrides it.
+     It resolves on :root, so a scope that overrides --color-primary must override this too (as with the tints and primary-solid below). */
+  --color-primary-mark: var(--color-primary);
+  /* Text and icons that sit on a solid primary / good / bad fill. */
+  --color-on-primary: #ffffff;
+  /* Solid blue pills that aren't controls (the chart's value tag, the "Why it matters" disc). Same as primary unless a scope overrides them. */
+  --color-primary-solid: var(--color-primary);
+  --color-on-primary-solid: var(--color-on-primary);
+
+  /* Meaning: up = emerald, down = rose (text-safe) */
+  --color-good: #047857;
+  --color-bad: #d41c45;
+  --color-warn: #b45309;
+  --color-neutral: #5b6779;
+  /* Marks (bars, dots, fills): brighter emerald / rose, 3:1+ on white. Text stays on good / bad. */
+  --color-good-mark: #059669;
+  --color-bad-mark: #f43f5e;
+  /* Soft pill backgrounds behind good / bad / primary text: translucent mixes of the text colour by default
+     (the same as bg-good/10 etc.); a scope can make them opaque. -strong is the 12% version. */
+  --color-good-tint: color-mix(in oklab, var(--color-good) 10%, transparent);
+  --color-bad-tint: color-mix(in oklab, var(--color-bad) 10%, transparent);
+  --color-primary-tint: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --color-good-tint-strong: color-mix(in oklab, var(--color-good) 12%, transparent);
+  --color-bad-tint-strong: color-mix(in oklab, var(--color-bad) 12%, transparent);
+  --color-warn-tint: color-mix(in oklab, var(--color-warn) 10%, transparent);
+
+  /* Icon tiles: one colour per indicator. */
+  --color-tile-blue: #3b82f6;
+  --color-tile-teal: #14b8a6;
+  --color-tile-amber: #f59e0b;
+  --color-tile-rose: #f43f5e;
+  --color-tile-violet: #8b5cf6;
+  --color-tile-indigo: #4f46e5;
+  --color-tile-ink: #0f172a;
+  /* Icon colour on the bright tiles (amber, rose, teal). */
+  --color-on-tile: #0f172a;
+  /* Icon colour on the deep tiles (blue, indigo, violet). */
+  --color-on-tile-solid: #ffffff;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --animate-rise: rise 0.7s var(--ease-out-soft) both;
+  --animate-fade: fade 0.5s var(--ease-out-soft) both;
+  --animate-grow-x: grow-x 1s var(--ease-out-soft) both;
+  --animate-grow-y: grow-y 0.9s var(--ease-out-soft) both;
+  --animate-pop: pop 0.18s var(--ease-out-soft) both;
+  --animate-pulse-dot: pulse-dot 2.4s ease-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes grow-y {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes reveal-x {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes pulse-dot {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-good-mark) 55%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 7px transparent;
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+  /* Cards: a hairline plus a soft two-layer shadow, so white cards read on the pale page. */
+  --shadow-card: 0 0 0 1px rgb(15 23 42 / 0.05), 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.05);
+  --shadow-pop: 0 0 0 1px rgb(15 23 42 / 0.06), 0 14px 32px rgb(15 23 42 / 0.12);
+  /* Top stop of the area gradient under line charts. */
+  --area-top: 0.24;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-page: #0a0c11;
+  --color-canvas: #101319;
+  --color-card: #151821;
+  --color-inset: #0e1117;
+  --color-chip: #232836;
+  --color-line: #2a303d;
+  --color-ink: #f8fafc;
+  --color-muted: #a3adbf;
+  --color-faint: #8590a3;
+  --color-primary: #60a5fa;
+  --color-accent: #60a5fa;
+  --color-bright: #60a5fa;
+  --color-soft: #4b5568;
+  --color-mist: #111827;
+  --color-on-primary: #0a0c11;
+  --color-good: #34d399;
+  --color-bad: #fb7185;
+  --color-warn: #fbbf24;
+  --color-neutral: #8590a3;
+  --color-good-mark: #34d399;
+  --color-bad-mark: #fb7185;
+  --area-top: 0.14;
+  --color-tile-ink: #334155;
+  --color-tile-blue: #3b82f6;
+  /* Dark: a 6% white hairline does the separating; the shadow is heavy black. */
+  --shadow-card: inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-pop: inset 0 0 0 1px rgb(255 255 255 / 0.09), 0 14px 32px rgb(0 0 0 / 0.55);
+}
+
+/*
+ * Pastel, site-wide (`pastel` on <body> in app/layout.tsx).
+ * Pastel fills and surfaces, deep text: only page / inset / chip, marks
+ * (bars, dots, chart lines), soft neutral bars and icon tiles change. Text
+ * tokens (ink, muted, faint, primary, good, bad, warn) are not overridden, so
+ * every text colour still passes 4.5:1. Marks stay 1.9:1+ on the card and
+ * always sit beside a label or sign. Remove the class to undo.
+ */
+.pastel {
+  --color-page: #f7f8fc;
+  --color-inset: #f3f5fb;
+  --color-chip: #e8ebf5;
+  --color-soft: #c4cbe0;
+  /* blue: deeper for dots and the chart line, lighter for stretches */
+  --color-primary-mark: #7aa7ff;
+  --color-bright: #7aa7ff;
+  --color-accent: #8ab4ff;
+  /* mint up, rose down */
+  --color-good-mark: #5fcf9d;
+  --color-bad-mark: #ff9aa8;
+  --color-tile-blue: #bcd4ff;
+  --color-tile-teal: #b5ece1;
+  --color-tile-amber: #ffe2a3;
+  --color-tile-rose: #ffc4cc;
+  --color-tile-violet: #dcd2ff;
+  --color-tile-indigo: #c9ccff;
+  --color-on-tile: #1e293b;
+  --color-on-tile-solid: #1e293b;
+}
+
+/* Light only: opaque pill tints (text on them passes 4.5:1 on cards and grey panels) and a soft blue for non-control solid pills. */
+:root:not([data-theme="dark"]) .pastel {
+  --color-primary-tint: #eef4ff;
+  --color-bad-tint: #fff0f2;
+  --color-good-tint: #e3f7ee;
+  --color-bad-tint-strong: #fff0f2;
+  --color-good-tint-strong: #e3f7ee;
+  --color-warn-tint: #fff3d6;
+  --color-primary-solid: #bcd4ff;
+  --color-on-primary-solid: #1e293b;
+}
+
+/*
+ * Dark: the same hues, softened for dark cards. Marks are a step lighter than
+ * the plain dark theme. Every icon tile is a solid soft pastel with a dark
+ * icon (7.8:1+), so the six indicator tiles read as one set. Pill tints and
+ * solid pills stay as the plain dark theme has them.
+ */
+[data-theme="dark"] .pastel {
+  --color-page: #0b0d14;
+  --color-inset: #10121b;
+  --color-chip: #252a3a;
+  --color-soft: #525a73;
+  --color-primary-mark: #7aa7ff;
+  --color-bright: #7aa7ff;
+  /* the range stretch sits darker than the "now" dot */
+  --color-accent: #5b84d6;
+  --color-good-mark: #7fd4ae;
+  --color-bad-mark: #f7a1ad;
+  --color-tile-blue: #a9c4f5;
+  --color-tile-teal: #8fd9c8;
+  --color-tile-amber: #e7c47a;
+  --color-tile-rose: #f2a6b1;
+  --color-tile-violet: #c6b6f2;
+  --color-tile-indigo: #b4baf2;
+  --color-on-tile: #1e293b;
+  --color-on-tile-solid: #1e293b;
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+@utility shadow-pop {
+  box-shadow: var(--shadow-pop);
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  transition: background-color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 0, "cv11" 1;
+}
+
+/*
+ * Readable type everywhere (home and detail pages): nothing below 11.5px,
+ * the smallest sizes get a touch of tracking. Unlayered, so it wins over the
+ * utilities; remove this block to undo.
+ */
+.text-\[9px\],
+.text-\[10px\] {
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+}
+.text-\[11px\] {
+  font-size: 12px;
+  letter-spacing: 0.005em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Recharts draws its own focus rectangle on click; the crosshair is enough. */
+.recharts-wrapper *:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Rows of a detail page rise in one after another. */
+.stagger > * {
+  position: relative;
+  animation: var(--animate-rise);
+}
+/* Earlier rows sit above later ones so their tooltips aren't covered. */
+.stagger > :first-child {
+  z-index: 3;
+}
+.stagger > :nth-child(2) {
+  animation-delay: 90ms;
+}
+.stagger > :nth-child(3) {
+  animation-delay: 180ms;
+}
+.stagger > :nth-child(4) {
+  animation-delay: 270ms;
+}
+
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: var(--ring-to);
+  }
+}
+
+@keyframes caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+}
+
+/*
+ * Calm type (all detail pages, via DetailPage): `type-calm` lifts
+ * the tiny sizes, darken faint text for contrast, soften bold to medium and
+ * cap long notes at a readable measure. Unlayered, so it wins over the
+ * utilities inside the scope; remove the class to undo.
+ */
+.type-calm .text-xs {
+  font-size: 13px;
+}
+.type-calm .font-semibold {
+  font-weight: 500;
+}
+.type-calm p.text-xs.leading-5,
+.type-calm p.text-sm.text-muted {
+  max-width: 72ch;
+}
+.type-calm .recharts-cartesian-axis-tick text {
+  font-size: 12px;
+}
+
+/*
+ * Detail-page type scale (pilot: `type-v2` on one page via DetailPage className).
+ * One scale, fewer sizes, clearer weights:
+ *   titles 18/600 · big numbers 600 tight · labels 13/500 · body 14.5/400 at 1.55 · micro 12/500.
+ * Unlayered, so it wins over utilities inside the scope; remove the class to undo.
+ */
+.type-v2 h2 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.type-v2 .font-semibold {
+  font-weight: 600;
+}
+.type-v2 .font-bold {
+  font-weight: 650;
+}
+/* Numbers: anything big and tabular reads as data, so it gets weight and tight tracking. */
+.type-v2 .tabular-nums:is(.text-lg, .text-xl, .text-2xl, .text-\[18px\], .text-\[19px\], .text-\[20px\], .text-\[22px\], .text-\[26px\], .text-\[28px\], .text-\[32px\], .text-\[34px\], .text-\[36px\], .text-\[40px\]) {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+/* Collapse near-duplicate sizes onto the scale. */
+.type-v2 :is(.text-\[17px\], .text-\[19px\]) {
+  font-size: 18px;
+}
+.type-v2 :is(.text-\[26px\], .text-\[28px\]) {
+  font-size: 28px;
+}
+.type-v2 :is(.text-\[13px\], .text-sm) {
+  font-size: 14px;
+}
+/* Body sentences: a touch larger with more line height. */
+.type-v2 p.text-sm,
+.type-v2 p.text-\[15px\] {
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+/* Small labels and captions: medium weight so they don't look washed out. */
+.type-v2 .text-xs.text-muted,
+.type-v2 .text-\[11px\].text-muted {
+  font-weight: 500;
+}
+.type-v2 .recharts-cartesian-axis-tick text {
+  font-size: 12px;
+  font-weight: 500;
+}
